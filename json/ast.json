@@ -3,7 +3,8 @@
 		"authors": [
 			"Crucifunked",
 			"Fitoschido",
-			"Xuacu"
+			"Xuacu",
+			"YoaR"
 		]
 	},
 	"Games.name": "Blockly games",
@@ -104,7 +105,7 @@
 	"Maze.helpRepeatMany": "Pues usar más d'un bloque dientro d'un bloque 'repetir'.",
 	"Maze.helpSkins": "Escueye'l to xugador favoritu dende esti menú.",
 	"Maze.helpIf": "Un bloque 'si' va faer daqué sólo si la condición ye verdadera. Tenta xirar a la izquierda si hai camín a la izquierda.",
-	"Maze.helpMenu": "Pulsia %1 nel bloque «si» pa camudar la so condición.",
+	"Maze.helpMenu": "Calca %1 nel bloque «si» pa camudar la so condición.",
 	"Maze.helpWallFollow": "¿Pues resolver esti complicáu llaberintu? Tenta siguir la paré de la izquierda. ¡Sólo pa programadores avanzaos!",
 	"Bird.noWorm": "nun tien guxanu",
 	"Bird.heading": "Cabecera",
