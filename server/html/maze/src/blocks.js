@@ -19,6 +19,20 @@ goog.require('Blockly.FieldDropdown');
 goog.require('Blockly.FieldImage');
 goog.require('BlocklyGames');
 
+/**
+ * Counterclockwise arrow to be appended to left turn option.
+ */
+const LEFT_TURN = ' ↺';
+
+/**
+ * Clockwise arrow to be appended to right turn option.
+ */
+const RIGHT_TURN = ' ↻';
+
+/**
+ * Straight arrow for move forward.
+ */
+const MOVE_FORWARD = ' ↑';
 
 /**
  * Construct custom maze block types.  Called on page load.
@@ -38,16 +52,6 @@ Maze.Blocks.init = function() {
    * Common HSV hue for all logic blocks.
    */
   const LOGIC_HUE = 210;
-
-  /**
-   * Counterclockwise arrow to be appended to left turn option.
-   */
-  const LEFT_TURN = ' ↺';
-
-  /**
-   * Clockwise arrow to be appended to right turn option.
-   */
-  const RIGHT_TURN = ' ↻';
 
   const TURN_DIRECTIONS = [
     [BlocklyGames.getMsg('Maze.turnLeft', false), 'turnLeft'],
@@ -180,12 +184,16 @@ Maze.Blocks.init = function() {
 
 Blockly.JavaScript['maze_moveForward'] = function(block) {
   // Generate JavaScript for moving forward.
-  return `moveForward('block_id_${block.id}');\n`;
+  return `moveForward('block_id_${block.id}'); //${MOVE_FORWARD}\n`;
 };
 
 Blockly.JavaScript['maze_turn'] = function(block) {
   // Generate JavaScript for turning left or right.
-  return `${block.getFieldValue('DIR')}('block_id_${block.id}');\n`;
+  if (block.getFieldValue('DIR') === 'turnLeft') {
+    return `turnLeft('block_id_${block.id}');    //${LEFT_TURN}\n`;
+  } else {
+    return `turnRight('block_id_${block.id}');   //${RIGHT_TURN}\n`;
+  }
 };
 
 Blockly.JavaScript['maze_if'] = function(block) {
