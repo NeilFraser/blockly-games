@@ -6,7 +6,8 @@
 			"Espertus",
 			"MSClaudiu",
 			"Minisarm",
-			"Oana"
+			"Oana",
+			"SZ475"
 		]
 	},
 	"Games.name": "Blockly Games",
@@ -50,7 +51,7 @@
 	"Games.helpAbort": "Acest nivel este extrem de dificil. Doriți să îl săriți și să mergeți la următorul joc? Vă puteți întoarce întotdeauna mai târziu.",
 	"Index.clear": "Ștergeți toate soluțiile?",
 	"Index.subTitle": "Jocuri pentru programatorii de mâine.",
-	"Index.moreInfo": "Mai multe informații",
+	"Index.moreInfo": "Informații pentru educatori...",
 	"Index.startOver": "Vrei să începi?",
 	"Index.clearData": "Ștergeți datele",
 	"Puzzle.animal1": "Rață",
@@ -253,6 +254,7 @@
 	"Pond.speedTooltip": "Returnează viteza curentă a jucătorului (0 este oprit, 100 este viteză maximă).",
 	"Pond.locXTooltip": "Returnează coordonatele X ale jucătorului (0 este marginea din stânga, 100 este marginea dreaptă).",
 	"Pond.locYTooltip": "Returnează coordonatele Y ale playerului (0 este marginea de jos, 100 este marginea de sus).",
+	"Pond.logTooltip": "Afișează un număr în consola browserului tău.",
 	"Pond.docsTooltip": "Afișați documentația lingvistică.",
 	"Pond.documentation": "Documentație",
 	"Pond.playerName": "Jucător",
