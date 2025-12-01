@@ -254,7 +254,7 @@
 	"Pond.locXTooltip": "Вяртае каардынату X гульца (0 — левы бок, 100 — правы бок).",
 	"Pond.locYTooltip": "Вяртае каардынату Y гульца (0 — ніжні край, 100 — верхні край).",
 	"Pond.logTooltip": "Друкуе лік у кансолі вашага браўзэру.",
-	"Pond.docsTooltip": "Паказаць дакумэнтацыю па мове.",
+	"Pond.docsTooltip": "Паказаць дакумэнтацыю на мову.",
 	"Pond.documentation": "Дакумэнтацыя",
 	"Pond.playerName": "Гулец",
 	"Pond.targetName": "Мэта",
