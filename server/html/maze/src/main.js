@@ -1055,6 +1055,9 @@ function animate() {
   if (!action) {
     BlocklyCode.highlight(null);
     levelHelp();
+    // Clear executedCode as a signal that we are done executing.
+    // The abortOffer dialog won't appear during execution.
+    BlocklyInterface.executedCode = '';
     return;
   }
   BlocklyCode.highlight(action[1]);

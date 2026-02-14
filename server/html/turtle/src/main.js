@@ -853,6 +853,9 @@ function checkAnswer() {
   } else {
     penColour('#ff0000');
   }
+  // Clear executedCode as a signal that we are done executing.
+  // The abortOffer dialog won't appear during execution.
+  BlocklyInterface.executedCode = '';
 }
 
 /**
