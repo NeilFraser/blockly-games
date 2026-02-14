@@ -841,6 +841,9 @@ function reset(first) {
   for (const path of paths) {
     path.setAttribute('stroke', SKIN.look);
   }
+
+  BlocklyInterface.executedCode = '';
+  BlocklyCode.executedJsCode = '';
 }
 
 /**

@@ -466,6 +466,9 @@ function reset() {
   pidList.forEach(clearTimeout);
   pidList.length = 0;
   interpreter = null;
+
+  BlocklyInterface.executedCode = '';
+  BlocklyCode.executedJsCode = '';
 }
 
 /**

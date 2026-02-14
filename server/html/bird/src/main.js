@@ -585,6 +585,9 @@ function reset(first) {
       MAP.nest.x / 100 * MAP_SIZE - NEST_ICON_SIZE / 2);
   nestImage.setAttribute('y',
       (1 - MAP.nest.y / 100) * MAP_SIZE - NEST_ICON_SIZE / 2);
+
+  BlocklyInterface.executedCode = '';
+  BlocklyCode.executedJsCode = '';
 }
 
 /**
