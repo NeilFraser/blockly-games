@@ -187,7 +187,7 @@ Pond.Battle.stop = function() {
     Pond.Battle.RANK.unshift(survivors.pop());
   }
   // Fire any callback.
-  Pond.Battle.doneCallback_ && Pond.Battle.doneCallback_(survivorCount);
+  Pond.Battle.doneCallback_?.(survivorCount);
 };
 
 /**

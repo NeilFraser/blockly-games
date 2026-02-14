@@ -421,7 +421,7 @@ Pond.Visualization.loadAudio_ = function(filenames, name) {
       break;
     }
   }
-  if (sound && sound.play) {
+  if (sound?.play) {
     Pond.Visualization.SOUNDS_.set(name, sound);
   }
 };

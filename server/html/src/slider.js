@@ -73,7 +73,7 @@ Slider = class {
     this.setValue(0.5);
 
     // Find the root SVG object.
-    while (svgParent && svgParent.nodeName.toLowerCase() !== 'svg') {
+    while (svgParent?.nodeName.toLowerCase() !== 'svg') {
       svgParent = svgParent.parentNode;
     }
     this.SVG_ = svgParent;
@@ -226,7 +226,7 @@ Slider = class {
     this.knob_.setAttribute('transform',
         'translate(' + x + ',' + this.KNOB_Y_ + ')');
     this.knobTarget_.setAttribute('cx', x);
-    this.changeFunc_ && this.changeFunc_(this.value_);
+    this.changeFunc_?.(this.value_);
   }
 
   /**

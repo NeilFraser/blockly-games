@@ -236,7 +236,7 @@ BlocklyDialogs.hideDialog = function(opt_animate = true) {
   }
 
   BlocklyDialogs.isDialogVisible_ = false;
-  BlocklyDialogs.dialogDispose_ && BlocklyDialogs.dialogDispose_();
+  BlocklyDialogs.dialogDispose_?.();
   BlocklyDialogs.dialogDispose_ = null;
   const origin = opt_animate ? BlocklyDialogs.dialogOrigin_ : null;
   const dialog = BlocklyGames.getElementById('dialog');

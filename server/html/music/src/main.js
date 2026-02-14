@@ -329,7 +329,7 @@ function drawNote(i, time, pitch, duration, className) {
     // Garbage collect the now-invisible splash note.
     // It might be already gone if the user hit 'reset'.
     setTimeout(function() {
-      splash.parentNode && splash.parentNode.removeChild(splash);
+      splash.parentNode?.removeChild(splash);
     }, 1000);
   }
   if (pitch === 0 || pitch === 12) {
@@ -603,7 +603,7 @@ function execute() {
     return;
   }
   reset();
-  Blockly.selected && Blockly.selected.unselect();
+  Blockly.selected?.unselect();
   // For safety, recompute startCount in the generator.
   Music.startCount.set(0);
   // Create an interpreter whose global scope will be the cross-thread global.

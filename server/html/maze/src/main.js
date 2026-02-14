@@ -562,7 +562,7 @@ function init() {
  * @param {Blockly.Events.Abstract=} opt_event Custom data for event.
  */
 function levelHelp(opt_event) {
-  if (opt_event && opt_event.isUiEvent) {
+  if (opt_event?.isUiEvent) {
     // Just a change to highlighting or somesuch.
     return;
   } else if (BlocklyInterface.workspace.isDragging()) {
@@ -775,7 +775,7 @@ function showPegmanMenu(e) {
       Blockly.browserEvents.bind(document.body, 'mousedown', null, hidePegmanMenu);
   // Close the skin-changing hint if open.
   const hint = BlocklyGames.getElementById('dialogHelpSkins');
-  if (hint && hint.className !== 'dialogHiddenContent') {
+  if (hint?.className !== 'dialogHiddenContent') {
     BlocklyDialogs.hideDialog(false);
   }
   showPegmanMenu.activatedOnce = true;
@@ -996,7 +996,7 @@ function execute() {
   }
 
   log.length = 0;
-  Blockly.selected && Blockly.selected.unselect();
+  Blockly.selected?.unselect();
   const code = BlocklyCode.getJsCode();
   BlocklyCode.executedJsCode = code;
   BlocklyInterface.executedCode = BlocklyInterface.getCode();
@@ -1447,7 +1447,7 @@ function isPath(direction, id) {
   let square, command;
   switch (constrainDirection4(effectiveDirection)) {
     case DirectionType.NORTH:
-      square = map[pegmanY - 1] && map[pegmanY - 1][pegmanX];
+      square = map[pegmanY - 1]?.[pegmanX];
       command = 'look_north';
       break;
     case DirectionType.EAST:
@@ -1455,7 +1455,7 @@ function isPath(direction, id) {
       command = 'look_east';
       break;
     case DirectionType.SOUTH:
-      square = map[pegmanY + 1] && map[pegmanY + 1][pegmanX];
+      square = map[pegmanY + 1]?.[pegmanX];
       command = 'look_south';
       break;
     case DirectionType.WEST:

@@ -132,7 +132,7 @@ Scrubber = class {
         'common/icons.png');
 
     // Find the root SVG object.
-    while (svgParent && svgParent.nodeName.toLowerCase() !== 'svg') {
+    while (svgParent?.nodeName.toLowerCase() !== 'svg') {
       svgParent = svgParent.parentElement;
     }
     this.SVG_ = svgParent;

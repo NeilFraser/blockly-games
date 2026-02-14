@@ -351,7 +351,7 @@ function drawFrame_(interpreter) {
  * @param {!Blockly.Events.Abstract=} opt_e Change event.
  */
 function codeChange(opt_e) {
-  if (opt_e && opt_e.isUiEvent) {
+  if (opt_e?.isUiEvent) {
     return;
   }
   if (BlocklyInterface.workspace.isDragging()) {

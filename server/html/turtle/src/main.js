@@ -203,10 +203,10 @@ function transform10(xml) {
       const type = node.getAttribute('type');
       // Find the last child that's a 'field'.
       let child = node.lastChild;
-      while (child && child.nodeName.toLowerCase() !== 'field') {
+      while (child?.nodeName.toLowerCase() !== 'field') {
         child = child.previousSibling;
       }
-      const childName = child && child.getAttribute('name');
+      const childName = child?.getAttribute('name');
 
       if (type === 'turtle_colour_internal' && childName === 'COLOUR') {
         /*
@@ -657,7 +657,7 @@ function execute() {
   }
 
   reset();
-  Blockly.selected && Blockly.selected.unselect();
+  Blockly.selected?.unselect();
   const code = BlocklyCode.getJsCode();
   BlocklyCode.executedJsCode = code;
   BlocklyInterface.executedCode = BlocklyInterface.getCode();

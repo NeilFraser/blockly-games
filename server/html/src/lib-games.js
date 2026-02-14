@@ -167,7 +167,7 @@ BlocklyGames.errorReporter_ = function(event) {
     const req = new XMLHttpRequest();
     // Try to use the experimental 'event.error.stack',
     // otherwise, use standard properties.
-    const report = (event.error && event.error.stack) ||
+    const report = (event.error?.stack) ||
         `${event.message} ${event.filename} ${event.lineno}:${event.colno}`;
     const params = "error=" + encodeURIComponent(report.trim()) +
         '&url=' + encodeURIComponent(window.location);

@@ -680,7 +680,7 @@ function execute() {
   }
 
   log.length = 0;
-  Blockly.selected && Blockly.selected.unselect();
+  Blockly.selected?.unselect();
   let code = BlocklyCode.getJsCode();
   BlocklyCode.executedJsCode = code;
   BlocklyInterface.executedCode = BlocklyInterface.getCode();

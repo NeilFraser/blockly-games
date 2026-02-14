@@ -237,11 +237,11 @@ function makeRequest(url, data, onSuccess, onFailure, method) {
   const xhr = new XMLHttpRequest();
   xhr.onload = function() {
     if (this.status === 200) {
-      onSuccess && onSuccess.call(xhr);
+      onSuccess?.call(xhr);
     } else {
       alert('Failed to execute ' + url);
       console.error(xhr);
-      onFailure && onFailure.call(xhr);
+      onFailure?.call(xhr);
     }
   };
   if (method === 'POST') {
