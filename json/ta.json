@@ -4,7 +4,8 @@
 			"Aswn",
 			"ElangoRamanujam",
 			"Ezhillang",
-			"Fahimrazick"
+			"Fahimrazick",
+			"Sridhar G"
 		]
 	},
 	"Games.name": "விளைபாடுகள்",
@@ -112,5 +113,6 @@
 	"Pond.playerName": "வீரர்",
 	"Pond.targetName": "இலக்கு",
 	"Pond.pendulumName": "ஊசலி",
-	"Pond.scaredName": "பயந்திருத்தல்"
+	"Pond.scaredName": "பயந்திருத்தல்",
+	"Gallery": "காட்சியகம்"
 }
