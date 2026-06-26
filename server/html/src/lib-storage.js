@@ -50,13 +50,17 @@ BlocklyStorage.link = function() {
  * @param {string} key Key to XML, obtained from href.
  */
 BlocklyStorage.retrieveXml = function(app, key) {
-  function fail(xhr) {
-    if (xhr.status === 404) {
+  /**
+   * If the request comes back as 404, print a nicer message.
+   * @this {!XMLHttpRequest}
+   */
+  function fail() {
+    if (this.status === 404) {
       BlocklyStorage.alert_(BlocklyGames.getMsg('Games.hashError', false)
           .replace('%1', window.location.hash));
     } else {
       BlocklyStorage.alert_(BlocklyGames.getMsg('Games.httpRequestError', false) +
-          '\nXHR status: ' + xhr.status);
+          '\nXHR status: ' + this.status);
     }
   }
   BlocklyStorage.makeRequest(`/data/${app}/storage/${key}.blockly`, '',
