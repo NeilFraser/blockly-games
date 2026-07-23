@@ -33,7 +33,7 @@
 	"Games.catProcedures": "Funktiounen",
 	"Games.httpRequestError": "Et gouf e Problem mat der Ufro.",
 	"Games.linkAlert": "Deelt Är Bléck mat dësem Link:\n\n%1",
-	"Games.hashError": "Leider entsprécht '%1' kengem vun de gespäicherte Programmer.",
+	"Games.hashError": "Leider entsprécht „%1“ kengem vun de gespäicherte Programmen.",
 	"Games.xmlError": "Äre gespäicherte Fichier konnt net geluede ginn. Vläicht hutt Dir e mat enger anerer Versioun vu Blockly gemaach?",
 	"Games.listVariable": "Lëscht",
 	"Games.textVariable": "Text",
