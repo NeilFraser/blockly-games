@@ -80,6 +80,7 @@ BlocklyGames.LANGUAGE_NAME_ = {
 //  'mzn': 'مازِرونی',  // RTL
   'nb': 'Norsk (bokmål)',
   'nl': 'Nederlands, Vlaams',
+//  'no': 'Norsk',
 //  'oc': 'Lenga d\'òc',
 //  'pa': 'पंजाबी',
   'pl': 'Polski',
