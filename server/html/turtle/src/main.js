@@ -469,6 +469,7 @@ function reset() {
 
   BlocklyInterface.executedCode = '';
   BlocklyCode.executedJsCode = '';
+  BlocklyInterface.isExecuting = false;
 }
 
 /**
@@ -665,6 +666,7 @@ function execute() {
   BlocklyCode.executedJsCode = code;
   BlocklyInterface.executedCode = BlocklyInterface.getCode();
   interpreter = new Interpreter(code, initInterpreter);
+  BlocklyInterface.isExecuting = true;
   pidList.push(setTimeout(executeChunk_, 100));
 }
 
@@ -701,6 +703,7 @@ function executeChunk_() {
   } while (go);
   // Wrap up if complete.
   if (!pause) {
+    BlocklyInterface.isExecuting = false;
     BlocklyGames.getElementById('spinner').style.visibility = 'hidden';
     BlocklyInterface.workspace.highlightBlock(null);
     checkAnswer();
@@ -856,9 +859,6 @@ function checkAnswer() {
   } else {
     penColour('#ff0000');
   }
-  // Clear executedCode as a signal that we are done executing.
-  // The abortOffer dialog won't appear during execution.
-  BlocklyInterface.executedCode = '';
 }
 
 /**

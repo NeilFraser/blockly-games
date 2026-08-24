@@ -47,6 +47,12 @@ BlocklyInterface.blocksDisabled = false;
 BlocklyInterface.executedCode = '';
 
 /**
+ * Is the user currently executing code?
+ * @type boolean
+ */
+BlocklyInterface.isExecuting = false;
+
+/**
  * Additional parameter to append when moving to next level.
  * @type string
  */

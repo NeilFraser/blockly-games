@@ -844,6 +844,7 @@ function reset(first) {
 
   BlocklyInterface.executedCode = '';
   BlocklyCode.executedJsCode = '';
+  BlocklyInterface.isExecuting = false;
 }
 
 /**
@@ -1047,6 +1048,7 @@ function execute() {
   // log now contains a transcript of all the user's actions.
   // Reset the maze and animate the transcript.
   reset(false);
+  BlocklyInterface.isExecuting = true;
   pidList.push(setTimeout(animate, 100));
 }
 
@@ -1057,10 +1059,8 @@ function animate() {
   const action = log.shift();
   if (!action) {
     BlocklyCode.highlight(null);
+    BlocklyInterface.isExecuting = false;
     levelHelp();
-    // Clear executedCode as a signal that we are done executing.
-    // The abortOffer dialog won't appear during execution.
-    BlocklyInterface.executedCode = '';
     return;
   }
   BlocklyCode.highlight(action[1]);

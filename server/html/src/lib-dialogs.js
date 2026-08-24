@@ -364,7 +364,7 @@ BlocklyDialogs.abortOffer = function() {
   // Don't override an existing dialog, or interrupt a drag, or interrupt a run.
   if (BlocklyDialogs.isDialogVisible_ ||
       BlocklyInterface.workspace.isDragging() ||
-      BlocklyInterface.executedCode) {
+      BlocklyInterface.isExecuting) {
     setTimeout(BlocklyDialogs.abortOffer, 15 * 1000);
     return;
   }

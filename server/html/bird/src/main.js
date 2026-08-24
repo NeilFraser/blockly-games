@@ -588,6 +588,7 @@ function reset(first) {
 
   BlocklyInterface.executedCode = '';
   BlocklyCode.executedJsCode = '';
+  BlocklyInterface.isExecuting = false;
 }
 
 /**
@@ -734,6 +735,7 @@ function execute() {
   // log now contains a transcript of all the user's actions.
   // Reset the bird and animate the transcript.
   reset(false);
+  BlocklyInterface.isExecuting = true;
   pidList.push(setTimeout(animate, 1));
 }
 
@@ -747,9 +749,7 @@ function animate() {
   const action = log.shift();
   if (!action) {
     BlocklyCode.highlight(null);
-    // Clear executedCode as a signal that we are done executing.
-    // The abortOffer dialog won't appear during execution.
-    BlocklyInterface.executedCode = '';
+    BlocklyInterface.isExecuting = false;
     return;
   }
   BlocklyCode.highlight(action.pop());
