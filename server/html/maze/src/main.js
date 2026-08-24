@@ -1046,8 +1046,7 @@ function execute() {
   }
 
   // log now contains a transcript of all the user's actions.
-  // Reset the maze and animate the transcript.
-  reset(false);
+  // Animate the transcript.
   BlocklyInterface.isExecuting = true;
   pidList.push(setTimeout(animate, 100));
 }

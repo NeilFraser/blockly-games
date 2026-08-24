@@ -733,8 +733,7 @@ function execute() {
   stepSpeed = (result === ResultType.SUCCESS) ? 10 : 15;
 
   // log now contains a transcript of all the user's actions.
-  // Reset the bird and animate the transcript.
-  reset(false);
+  // Animate the transcript.
   BlocklyInterface.isExecuting = true;
   pidList.push(setTimeout(animate, 1));
 }
