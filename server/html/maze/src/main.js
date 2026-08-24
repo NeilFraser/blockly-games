@@ -842,8 +842,6 @@ function reset(first) {
     path.setAttribute('stroke', SKIN.look);
   }
 
-  BlocklyInterface.executedCode = '';
-  BlocklyCode.executedJsCode = '';
   BlocklyInterface.isExecuting = false;
 }
 
@@ -927,6 +925,8 @@ function resetButtonClick(e) {
   BlocklyGames.getElementById('resetButton').style.display = 'none';
   BlocklyInterface.workspace.highlightBlock(null);
   reset(false);
+  BlocklyInterface.executedCode = '';
+  BlocklyCode.executedJsCode = '';
   levelHelp();
 }
 
