@@ -4,6 +4,7 @@
 			"Anakmalaysia",
 			"Aurora",
 			"Espertus",
+			"Hakimi97",
 			"Izington",
 			"Jeluang Terluang",
 			"Kurniasan"
@@ -219,7 +220,7 @@
 	"Pond.locXTooltip": "Menyatakan koordinat X pemain (0 = hujung kiri, 100 = hujung kanan).",
 	"Pond.locYTooltip": "Mengembalikan koordinat Y pemain (0 = hujung bawah, 100 = hujung atas).",
 	"Pond.docsTooltip": "Paparkan dokumentasi bahasa.",
-	"Pond.documentation": "Dokumentasi",
+	"Pond.documentation": "Pendokumenan",
 	"Pond.playerName": "Pemain",
 	"Pond.targetName": "Sasaran",
 	"Pond.pendulumName": "Bandul",
