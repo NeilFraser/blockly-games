@@ -219,7 +219,7 @@
 	"Pond.speedTooltip": "Menyatakan kelajuan semasa pemain (0 = pegun, 100 = kelajuan penuh).",
 	"Pond.locXTooltip": "Menyatakan koordinat X pemain (0 = hujung kiri, 100 = hujung kanan).",
 	"Pond.locYTooltip": "Mengembalikan koordinat Y pemain (0 = hujung bawah, 100 = hujung atas).",
-	"Pond.docsTooltip": "Paparkan dokumentasi bahasa.",
+	"Pond.docsTooltip": "Paparkan pendokumenan bahasa.",
 	"Pond.documentation": "Pendokumenan",
 	"Pond.playerName": "Pemain",
 	"Pond.targetName": "Sasaran",
