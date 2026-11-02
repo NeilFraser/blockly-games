@@ -1,9 +1,11 @@
 {
 	"@metadata": {
 		"authors": [
-			"Saraiki"
+			"Saraiki",
+			"Tauqeerkhansurani"
 		]
 	},
+	"Games.name": "بلاکلی گیمز",
 	"Games.puzzle": "بجھارت",
 	"Games.maze": "مکئی",
 	"Games.bird": "پکھُو",
