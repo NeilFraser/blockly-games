@@ -27,240 +27,369 @@
 # cycle since there is no need to rebuild or recompile, just reload.
 
 import json
-import os.path
+import os
 import re
 import subprocess
 import sys
+from pathlib import Path
+from typing import List
 
-
-if sys.version_info[0] < 3:
-    raise Exception("Must be using Python 3")
+# Check Python version
+if sys.version_info < (3, 6):
+    raise Exception("This script requires Python 3.6 or higher.")
 
 # Define a warning message for all the generated files.
-WARNING = '// Automatically generated file.  Do not edit!\n'
+WARNING = '// Automatically generated file. Do not edit!\n'
 
-blocklyMessageNames = []
-blocklyGamesMessageNames = []
+# Global variables to store message names (used across functions)
+blocklyMessageNames: List[str] = []
+blocklyGamesMessageNames: List[str] = []
 
-def main(gameName):
-  print('Compressing %s' % gameName.title())
-  if not os.path.exists('server/html/%s/generated' % gameName):
-    os.mkdir('server/html/%s/generated' % gameName)
-  generate_uncompressed(gameName)
-  generate_compressed(gameName)
-  filterMessages(gameName)
+def main(gameName: str):
+    """
+    Manages the compression and language file filtering process for the specified game.
+    """
+    global blocklyMessageNames, blocklyGamesMessageNames
+    
+    print(f'🤖 Starting Build Process for {gameName.title()}...')
 
-  # Extract the list of supported languages from boot.js.
-  # This is a bit fragile.
-  boot = open('server/html/common/boot.js', 'r')
-  js = ' '.join(boot.readlines())
-  boot.close()
-  m = re.search('\\[\'BlocklyGamesLanguages\'\\] = (\\[[-,\'\\s\\w]+\\])', js)
-  if not m:
-    raise Exception("Can't find BlocklyGamesLanguages in boot.js")
-  langs = m.group(1)
-  langs = langs.replace("'", '"')
-  langs = json.loads(langs)
+    # Define paths using Path objects for cross-OS compatibility
+    game_path = Path('server/html') / gameName
+    generated_path = game_path / 'generated'
 
-  for lang in langs:
-    language(gameName, lang)
-  print("")
+    # Create necessary directories
+    try:
+        generated_path.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        print(f"Error: Failed to create necessary directories: {e}")
+        sys.exit(1)
 
+    # Perform compression first
+    generate_uncompressed(gameName, game_path, generated_path)
+    generate_compressed(gameName, game_path, generated_path)
+    
+    # Filter messages based on the compiled JS file
+    filterMessages(gameName, generated_path)
 
-def filterMessages(gameName):
-  global blocklyMessageNames, blocklyGamesMessageNames
-  # Identify all the Blockly messages used.
-  # Load the compiled game.
-  f = open('server/html/%s/generated/compressed.js' % gameName, 'r')
-  js = f.read()
-  f.close()
-  # Load any language file (they all should have the same keys).
-  msgs = getMessages('en')
-  for msg in msgs:
-    m = re.search('BlocklyMsg\\["([^"]+)"\\] = ', msg)
-    if m:
-      if (('"' + m.group(1) + '"') in js or
-          ('.' + m.group(1)) in js or
-          ('%{BKY_' + m.group(1) + '}') in js):
-        blocklyMessageNames.append(m.group(1))
-    m = re.search('BlocklyGamesMsg\\["([^"]+)"\\] = ', msg)
-    if m:
-      if ('"' + m.group(1) + '"') in js or ('.' + m.group(1)) in js:
-        blocklyGamesMessageNames.append(m.group(1))
-  print("Found %d Blockly messages." % len(blocklyMessageNames))
-  blocklyMessageNames.sort()
-  print("Found %d Blockly Games messages." % len(blocklyGamesMessageNames))
-  blocklyGamesMessageNames.sort()
+    # Extract the list of supported languages from boot.js.
+    langs = get_supported_languages()
 
+    # Generate language files for each supported language
+    for lang in langs:
+        language(gameName, lang, generated_path)
+    
+    print(f"\n✅ Build Process for {gameName.title()} Completed.")
 
-def getMessages(lang):
-  # Read all messages for this language.
-  blocklyMsgFileName = 'server/html/generated/msg/%s.js' % lang
-  f = open(blocklyMsgFileName, 'r')
-  msgs = f.readlines()
-  f.close()
-  return msgs
+def get_supported_languages() -> List[str]:
+    """
+    Extracts the list of supported languages from common/boot.js.
+    """
+    boot_file = Path('server/html/common/boot.js')
+    if not boot_file.exists():
+        raise FileNotFoundError(f"Error: boot.js not found at {boot_file}")
 
-
-def language(gameName, lang):
-  global blocklyMessageNames, blocklyGamesMessageNames
-  msgs = getMessages(lang)
-  # Only write out messages that are used (as detected in filterMessages).
-  bMsgs = []
-  bgMsgs = []
-  for msg in msgs:
-    m = re.search('BlocklyMsg\\["([^"]+)"\\] = (.*);\\s*', msg)
-    if m and m.group(1) in blocklyMessageNames:
-      # Blockly message names are all alphabetic, no need to quote.
-      bMsgs.append('%s:%s' % (m.group(1), m.group(2)))
-    m = re.search('BlocklyGamesMsg\\["([^"]+)"\\] = (.*);\\s*', msg)
-    if m and m.group(1) in blocklyGamesMessageNames:
-      # Blockly Games message names contain dots, quotes required.
-      bgMsgs.append('"%s":%s' % (m.group(1), m.group(2)))
-
-  if not os.path.exists('server/html/%s/generated/msg' % gameName):
-    os.mkdir('server/html/%s/generated/msg' % gameName)
-  f = open('server/html/%s/generated/msg/%s.js' % (gameName, lang), 'w')
-  f.write(WARNING)
-  if bMsgs:
-    f.write('var BlocklyMsg={%s}\n' % ','.join(bMsgs))
-  if bgMsgs:
-    f.write('var BlocklyGamesMsg={%s}\n' % ','.join(bgMsgs))
-  f.close()
+    print(f"🌍 Retrieving Supported Languages...")
+    
+    try:
+        js = boot_file.read_text()
+        # Find the BlocklyGamesLanguages array definition
+        m = re.search(r'\[\'BlocklyGamesLanguages\'\] = (\[[-,\'\s\w]+\])', js)
+        
+        if not m:
+            raise Exception("Cannot find BlocklyGamesLanguages definition in boot.js")
+        
+        # Parse the JSON array
+        langs_str = m.group(1).replace("'", '"')
+        return json.loads(langs_str)
+    except Exception as e:
+        print(f"Error: Failed to extract languages: {e}")
+        sys.exit(1)
 
 
-def generate_uncompressed(gameName):
-  cmd = ['third-party/closurebuilder/closurebuilder.py',
-      '--root=server/html/third-party/',
-      '--root=server/html/generated/',
-      '--root=server/html/src/',
-      '--exclude=',
-      '--namespace=%s' % gameName.replace('/', '.').title()]
-  directory = gameName
-  while directory:
-    subdir = 'server/html/%s/generated/' % directory
-    if os.path.isdir(subdir):
-      cmd.append('--root=%s' % subdir)
-    subdir = 'server/html/%s/src/' % directory
-    if os.path.isdir(subdir):
-      cmd.append('--root=%s' % subdir)
-    (directory, sep, fragment) = directory.rpartition(os.path.sep)
-  try:
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-  except:
-    raise Exception("Failed to Popen: %s" % ' '.join(cmd))
-  files = readStdout(proc)
+def filterMessages(gameName: str, generated_path: Path):
+    """
+    Filters Blockly and Blockly Games messages based on usage within the compressed JS file.
+    Updates global blocklyMessageNames and blocklyGamesMessageNames lists.
+    """
+    global blocklyMessageNames, blocklyGamesMessageNames
+    
+    compressed_file = generated_path / 'compressed.js'
+    if not compressed_file.exists():
+        print(f"Error: compressed.js not found. Compilation may have failed: {compressed_file}")
+        return
 
-  if gameName == 'pond/docs':
-    path = '../'
-  else:
-    path = ''
-  prefix = 'server/html/'
-  srcs = []
-  for file in files:
-    file = file.strip()
-    if file[:len(prefix)] == prefix:
-      file = file[len(prefix):]
-    else:
-      raise Exception('"%s" is not in "%s".' % (file, prefix))
-    srcs.append('"%s%s"' % (path, file))
-  f = open('server/html/%s/generated/uncompressed.js' % gameName, 'w')
-  f.write("""%s
+    # Read the compressed code
+    js = compressed_file.read_text()
+
+    # Get 'en' messages (assuming it contains all keys)
+    msgs = getMessages('en')
+    
+    # Regex patterns to find message definitions
+    blockly_re = re.compile(r'BlocklyMsg\["([^"]+)"\] = ')
+    bg_re = re.compile(r'BlocklyGamesMsg\["([^"]+)"\] = ')
+
+    for msg in msgs:
+        # Check for Blockly messages
+        m = blockly_re.search(msg)
+        if m:
+            key = m.group(1)
+            # Check for different usage forms in the compiled code: quoted, dot notation, or %{BKY_...}
+            if (f'"{key}"' in js or
+                f'.{key}' in js or
+                f'%{{BKY_{key}}}' in js):
+                blocklyMessageNames.append(key)
+        
+        # Check for BlocklyGames messages
+        m = bg_re.search(msg)
+        if m:
+            key = m.group(1)
+            # Check for quoted or dot notation usage
+            if f'"{key}"' in js or f'.{key}' in js:
+                blocklyGamesMessageNames.append(key)
+
+    # Deduplicate and sort the lists
+    blocklyMessageNames = sorted(list(set(blocklyMessageNames)))
+    blocklyGamesMessageNames = sorted(list(set(blocklyGamesMessageNames)))
+    
+    print(f"🏷️ Found {len(blocklyMessageNames)} used Blockly messages.")
+    print(f"🏷️ Found {len(blocklyGamesMessageNames)} used Blockly Games messages.")
+
+
+def getMessages(lang: str) -> List[str]:
+    """
+    Reads all messages for a specific language.
+    """
+    msg_file = Path('server/html/generated/msg') / f'{lang}.js'
+    if not msg_file.exists():
+        # This warning is expected for languages other than 'en' if msg compilation hasn't happened yet.
+        # But we only call this for 'en' in filterMessages, so it should exist.
+        print(f"Warning: Language file not found: {msg_file}")
+        return []
+
+    return msg_file.read_text().splitlines()
+
+
+def language(gameName: str, lang: str, generated_path: Path):
+    """
+    Generates the minimized JS message file for a specific language,
+    containing only the messages identified as used.
+    """
+    global blocklyMessageNames, blocklyGamesMessageNames
+    
+    msgs = getMessages(lang)
+    if not msgs:
+        return # Skip if no messages found
+
+    bMsgs = []
+    bgMsgs = []
+    
+    blockly_re = re.compile(r'BlocklyMsg\["([^"]+)"\] = (.*);\s*')
+    bg_re = re.compile(r'BlocklyGamesMsg\["([^"]+)"\] = (.*);\s*')
+    
+    for msg in msgs:
+        # Process Blockly Messages
+        m = blockly_re.search(msg)
+        if m and m.group(1) in blocklyMessageNames:
+            # Blockly message names are typically alphabetic, no need to quote keys.
+            bMsgs.append(f'{m.group(1)}:{m.group(2)}')
+        
+        # Process Blockly Games Messages
+        m = bg_re.search(msg)
+        if m and m.group(1) in blocklyGamesMessageNames:
+            # Blockly Games message names contain dots, quotes required for keys.
+            bgMsgs.append(f'"{m.group(1)}":{m.group(2)}')
+
+    # Create the language file directory
+    msg_dir = generated_path / 'msg'
+    msg_dir.mkdir(parents=True, exist_ok=True)
+    
+    output_file = msg_dir / f'{lang}.js'
+    
+    # Write the minimized message objects
+    with output_file.open('w') as f:
+        f.write(WARNING)
+        if bMsgs:
+            f.write(f"var BlocklyMsg={{{','.join(bMsgs)}}}\n")
+        if bgMsgs:
+            f.write(f"var BlocklyGamesMsg={{{','.join(bgMsgs)}}}\n")
+            
+    print(f"  - Message file created: {lang}.js")
+
+
+def generate_uncompressed(gameName: str, game_path: Path, generated_path: Path):
+    """
+    Uses Closure Builder to extract the dependency list and creates the uncompressed JS loader file.
+    """
+    print("✨ Extracting Dependencies (uncompressed.js)...")
+    
+    cmd = [
+        'third-party/closurebuilder/closurebuilder.py',
+        '--root=server/html/third-party/',
+        '--root=server/html/generated/',
+        '--root=server/html/src/',
+        '--exclude=',
+        f'--namespace={gameName.replace("/", ".").title()}'
+    ]
+    
+    # Add source and generated directories from the game's path and its parent directories
+    current_dir = Path(gameName)
+    # Loop up the directory tree (e.g., from 'maze' to '.')
+    while current_dir != Path('.'):
+        subdir_generated = Path('server/html') / current_dir / 'generated/'
+        if subdir_generated.is_dir():
+            cmd.append(f'--root={subdir_generated}')
+        subdir_src = Path('server/html') / current_dir / 'src/'
+        if subdir_src.is_dir():
+            cmd.append(f'--root={subdir_src}')
+        
+        # Move to the parent directory
+        parent_dir = current_dir.parent
+        if parent_dir == current_dir: # Break if at the root
+            break
+        current_dir = parent_dir
+    
+    try:
+        # Run closurebuilder; output is a list of dependency files
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        files = proc.stdout.splitlines()
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Closure Builder failed (uncompressed): {e.stderr}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Error: closurebuilder.py not found. Check the path.")
+        sys.exit(1)
+
+    # Process file paths to be relative to the HTML root
+    prefix = 'server/html/'
+    # Handle the special case where 'pond/docs' needs to access files in 'server/html/' via '../'
+    path_prefix = '../' if gameName == 'pond/docs' else ''
+    srcs = []
+    
+    for file in files:
+        file = file.strip()
+        if file.startswith(prefix):
+            file = file[len(prefix):]
+        else:
+            raise Exception(f'"{file}" is not in the expected "{prefix}" directory.')
+        srcs.append(f'"{path_prefix}{file}"')
+    
+    output_file = generated_path / 'uncompressed.js'
+    
+    # Generate the JS loader script content
+    script_content = f"""{WARNING}
 window.CLOSURE_NO_DEPS = true;
 
-(function() {
-  var srcs = [
-      %s
-  ];
-  function loadScript() {
-    var src = srcs.shift();
-    if (src) {
-      var script = document.createElement('script');
-      script.src = src;
-      script.type = 'text/javascript';
-      script.onload = loadScript;
-      document.head.appendChild(script);
-    }
-  }
-  loadScript();
-})();
-""" % (WARNING, ',\n      '.join(srcs)))
-  f.close()
-  print('Found %d dependencies.' % len(srcs))
+(function() {{
+    var srcs = [
+        {',\n        '.join(srcs)}
+    ];
+    function loadScript() {{
+        var src = srcs.shift();
+        if (src) {{
+            var script = document.createElement('script');
+            script.src = src;
+            script.type = 'text/javascript';
+            script.onload = loadScript;
+            document.head.appendChild(script);
+        }}
+    }}
+    loadScript();
+}})();
+"""
+    output_file.write_text(script_content)
+    print(f'  - Found {len(srcs)} dependencies and created uncompressed.js.')
 
 
-def generate_compressed(gameName):
-  cmd = [
-    'java',
-    '-jar', 'build/third-party-downloads/closure-compiler.jar',
-    '--generate_exports',
-    '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
-    '--dependency_mode=PRUNE',
-    '--externs', 'externs/interpreter-externs.js',
-    '--externs', 'externs/prettify-externs.js',
-    '--externs', 'externs/soundJS-externs.js',
-    '--externs', 'externs/storage-externs.js',
-    '--externs', 'externs/svg-externs.js',
-    #'--language_in', 'STABLE',
-    '--language_out', 'ECMASCRIPT5',
-    '--entry_point=server/html/%s/src/main' % gameName,
-    "--js='server/html/third-party/base.js'",
-    "--js='server/html/third-party/blockly/**.js'",
-    "--js='server/html/src/*.js'",
-    '--warning_level', 'QUIET',
-  ]
-  directory = gameName
-  while directory:
-    cmd.append("--js='server/html/%s/src/*.js'" % directory)
-    (directory, sep, fragment) = directory.rpartition(os.path.sep)
-  try:
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-  except:
-    print("Failed to Popen: %s" % cmd)
-    raise
-  script = readStdout(proc)
-  script = ''.join(script)
-  script = trim_licence(script)
-  print('Compressed to %d KB.' % (len(script) / 1024))
+def generate_compressed(gameName: str, game_path: Path, generated_path: Path):
+    """
+    Uses Closure Compiler to compress the JS code into a single file.
+    """
+    print("🔥 Compressing JavaScript Code (compressed.js)...")
+    
+    # Define the main entry point
+    entry_point = Path('server/html') / gameName / 'src/main'
 
-  f = open('server/html/%s/generated/compressed.js' % gameName, 'w')
-  f.write(WARNING)
-  f.write(script)
-  f.close()
+    cmd = [
+        'java',
+        '-jar', 'build/third-party-downloads/closure-compiler.jar',
+        '--generate_exports',
+        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+        '--dependency_mode=PRUNE',
+        # External definitions (externs) for global symbols not known to the compiler
+        '--externs', 'externs/interpreter-externs.js',
+        '--externs', 'externs/prettify-externs.js',
+        '--externs', 'externs/soundJS-externs.js',
+        '--externs', 'externs/storage-externs.js',
+        '--externs', 'externs/svg-externs.js',
+        '--language_out', 'ECMASCRIPT5',
+        f'--entry_point={entry_point}',
+        # Base and common files
+        "--js='server/html/third-party/base.js'",
+        "--js='server/html/third-party/blockly/**.js'",
+        "--js='server/html/src/*.js'",
+        '--warning_level', 'QUIET',
+    ]
+    
+    # Add source files from the game's path and its parents
+    current_dir = Path(gameName)
+    while current_dir != Path('.'):
+        cmd.append(f"--js='server/html/{current_dir}/src/*.js'")
+        # Move to the parent directory
+        parent_dir = current_dir.parent
+        if parent_dir == current_dir:
+            break
+        current_dir = parent_dir
+    
+    try:
+        # Run Closure Compiler
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        script = proc.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Closure Compiler failed (compressed): {e.stderr}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Error: closure-compiler.jar not found. Check the path.")
+        sys.exit(1)
 
-def trim_licence(code):
-  """Strip out Google's and MIT's Apache licences.
+    # Strip out Apache 2.0 licenses from Google/MIT
+    script = trim_licence(script)
+    
+    # Write the output file
+    output_file = generated_path / 'compressed.js'
+    output_file.write_text(WARNING + script)
 
-  JS Compiler preserves dozens of Apache licences in the Blockly code.
-  Remove these if they belong to Google or MIT.
-  MIT's permission to do this is logged in Blockly issue 2412.
-
-  Args:
-    code: Large blob of compiled source code.
-
-  Returns:
-    Code with Google's and MIT's Apache licences trimmed.
-  """
-  apache2 = re.compile("""/\\*
-
- (Copyright \\d+ (Google LLC|Massachusetts Institute of Technology))
-( All rights reserved.
-)? SPDX-License-Identifier: Apache-2.0
-\\*/""")
-  return re.sub(apache2, '', code)
+    print(f'  - Compressed to {len(script) / 1024:.2f} KB.')
 
 
-def readStdout(proc):
-  data = proc.stdout.readlines()
-  # Python 2 reads stdout as text.
-  # Python 3 reads stdout as bytes.
-  return list(map(lambda line:
-      type(line) == str and line or str(line, 'utf-8'), data))
+def trim_licence(code: str) -> str:
+    """
+    Strips out Google's and MIT's Apache 2.0 licences from the compiled code.
 
+    Args:
+      code: Large blob of compiled source code.
+
+    Returns:
+      Code with Google's and MIT's Apache licences trimmed.
+    """
+    # Regex pattern for the multi-line Apache 2.0 license header
+    apache2_re = re.compile(
+        r'/\*\s*\n'
+        r'(Copyright \d+ (Google LLC|Massachusetts Institute of Technology))'
+        r'( All rights reserved.\n)?'
+        r' SPDX-License-Identifier: Apache-2.0\n'
+        r'\*/',
+        re.DOTALL
+    )
+    return apache2_re.sub('', code)
+
+
+# The original readStdout function is no longer needed as subprocess.run(text=True) handles encoding.
 
 if __name__ == '__main__':
-  if len(sys.argv) == 2:
-    main(sys.argv[1])
-  else:
-    print('Format: %s <appname>' % sys.argv[0])
-    sys.exit(2)
+    # Check for command line arguments
+    if len(sys.argv) == 2:
+        # Pass the game name to the main function
+        main(sys.argv[1])
+    else:
+        print(f'Usage: {sys.argv[0]} <appname>')
+        sys.exit(2)
